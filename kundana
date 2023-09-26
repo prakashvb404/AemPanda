@@ -1,0 +1,23 @@
+jest.mock('../../config', () => ({
+    AWS_REGION: 'us-east-1',
+    AWS_S3_BUCKET: 'my-bucket',
+    AWS_ACCESS_KEY_ID: 'my-access-key-id',
+    AWS_SECRET_ACCESS_KEY: 'my-secret-access-key',
+}));
+
+process.env.AWS_ACCESS_KEY_ID = 'my-access-key-id';
+process.env.AWS_SECRET_ACCESS_KEY = 'my-secret-access-key';
+
+
+describe('createPresignedUrlWithClient()', () => {
+    it('should return a presigned URL for a PUT object operation', async () => {
+        const presignedUrl = await createPresignedUrlWithClient({
+            region: 'us-east-1',
+            bucket: 'my-bucket',
+            key: 'my-object'
+        });
+        console.log("presignedUrl ",presignedUrl);
+       // const presignedUrl = jest.spyOn(formProcessorUtils, 'createPresignedUrlWithClient');
+       // expect(presignedUrl).toBeInstanceOf(String);
+        expect(presignedUrl.startsWith('https://my-bucket.s3.us-east-1.amazonaws.com/my-object?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD')).toBe(true);
+    });
