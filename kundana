@@ -21,3 +21,18 @@ describe('createPresignedUrlWithClient()', () => {
        // expect(presignedUrl).toBeInstanceOf(String);
         expect(presignedUrl.startsWith('https://my-bucket.s3.us-east-1.amazonaws.com/my-object?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD')).toBe(true);
     });
+ it('should add the `X-Amz-Content-Sha256` header with the value `UNSIGNED-PAYLOAD`', async () => {
+        const presignedUrl = await createPresignedUrlWithClient({
+            region: 'us-east-1',
+            bucket: 'my-bucket',
+            key: 'my-object'
+        });
+        console.log("presignedUrl one",presignedUrl);
+        const response = await fetch(presignedUrl, {
+            method: 'PUT',
+            body: 'Hello, world!',
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.headers.get('x-amz-content-sha256')).toBe('UNSIGNED-PAYLOAD');
+    });
